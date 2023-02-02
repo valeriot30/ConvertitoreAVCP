@@ -1,0 +1,13 @@
+Manifest-Version: 1.0
+Main-Class: com.pointservice.demo.Start
+Class-Path: javafx-base-17.0.2.jar javafx-fxml-17.0.2-win.jar jdom2-2.0.
+ 6.jar javafx-fxml-17.0.2.jar mssql-jdbc-7.0.0.jre8.jar log4j-1.2.17.jar
+  javafx-controls-17.0.2-win.jar controlsfx-11.1.1.jar javafx-graphics-1
+ 7.0.2-win.jar javafx-graphics-17.0.2.jar javafx-controls-17.0.2.jar jav
+ afx-base-17.0.2-win.jar javafx-fxml-18.jar javafx-fxml-18-win.jar javaf
+ x-controls-18.jar javafx-controls-18-win.jar javafx-graphics-18.jar jav
+ afx-graphics-18-win.jar javafx-base-18.jar javafx-base-18-win.jar poi-5
+ .2.3.jar commons-codec-1.15.jar commons-collections4-4.4.jar commons-ma
+ th3-3.6.1.jar commons-io-2.11.0.jar SparseBitSet-1.2.jar log4j-api-2.18
+ .0.jar
+
