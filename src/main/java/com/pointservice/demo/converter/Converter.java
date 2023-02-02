@@ -5,11 +5,13 @@ import com.pointservice.demo.model.AttributeType;
 import com.pointservice.demo.model.Field;
 import com.pointservice.demo.utils.Utils;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
+import org.apache.poi.util.StringUtil;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
@@ -179,6 +181,8 @@ public abstract class Converter {
                 continue;
             }
 
+            if(sceltaContraenteNum == 0) continue;
+
             String importoSommeLiquidateText = this.tryOrGetValue(row, AttributeType.SOMME_LIQUIDATE.getValue());
             importoSommeLiquidateText = this.getNormalizedPrice(importoSommeLiquidateText);
             String ruolo = this.tryOrGetValue(row, AttributeType.RUOLO_INVITATO1.getValue());
@@ -190,7 +194,11 @@ public abstract class Converter {
             // ottieni la scelta contranente dal numero
             String sceltaContraenteText = this.sceltaContrenteTypes.get(sceltaContraenteNum);
 
-            oggetto.addContent(String.format("<![CDATA[%s]]>", subject.toLowerCase()));
+            if(StringUtils.isAllUpperCase(subject)) {
+                subject = subject.toLowerCase();
+            }
+
+            oggetto.addContent(String.format("<![CDATA[%s]]>", subject));
             codFiscale.setText(codFiscaleText);
             denominazione.setText(denominazioneText);
             cig.setText(cigElement.replace(".", "").trim());
@@ -301,9 +309,11 @@ public abstract class Converter {
 
         String theString = price;
 
+        if(theString.length() == 0) return "";
+
         theString = theString.replace("€", "").trim();
 
-        if(theString.length() == 0) return "";
+
 
         String separator = ",";
         String replacement = ".";
