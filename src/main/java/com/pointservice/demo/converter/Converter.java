@@ -190,12 +190,16 @@ public abstract class Converter {
             // ottieni la scelta contranente dal numero
             String sceltaContraenteText = this.sceltaContrenteTypes.get(sceltaContraenteNum);
 
-            oggetto.addContent(subject);
+            oggetto.addContent(String.format("<![CDATA[%s]]>", subject.toLowerCase()));
             codFiscale.setText(codFiscaleText);
             denominazione.setText(denominazioneText);
-            cig.setText(cigElement);
+            cig.setText(cigElement.replace(".", "").trim());
             sceltaContraente.setText(sceltaContraenteText);
-            importoSommeLiquidate.addContent(importoSommeLiquidateText);
+            if(!importoSommeLiquidateText.equals("")) {
+                importoSommeLiquidate.addContent((importoSommeLiquidateText));
+            } else {
+                importoSommeLiquidate.addContent(("0.0"));
+            }
 
             //TODO generarli automaticamente
             Element partecipante = new Element("partecipante");
@@ -227,15 +231,16 @@ public abstract class Converter {
 
             lotto.addContent(cig);
             lotto.addContent(strutturaProponente);
-            if(!subject.equals("")) lotto.addContent(oggetto);
+            lotto.addContent(oggetto);
             if(!sceltaContraenteText.equals("")) lotto.addContent(sceltaContraente);
             lotto.addContent(partecipanti);
             lotto.addContent(aggiudicatari);
             if(!importoAggiudicazione.equals("")) {
-                lotto.addContent(new Element("importoAggiudicazione").setText(this.getNormalizedPrice(importoAggiudicazione)));
+                lotto.addContent(new Element("importoAggiudicazione").setText(importoAggiudicazione));
             }
             if(!dataInizio.equals("")) lotto.addContent(tempiCompletamento);
-            if(!importoSommeLiquidateText.equals("")) lotto.addContent(importoSommeLiquidate);
+            lotto.addContent(importoSommeLiquidate);
+
             data.addContent(lotto);
         }
 
@@ -292,7 +297,7 @@ public abstract class Converter {
 
         if(price.length() == 0) return "";
 
-        if(price.contains(".")) return price;
+        if(price.contains(".") && !price.contains("€")) return price;
 
         String theString = price;
 
@@ -305,7 +310,6 @@ public abstract class Converter {
         try {
             String newString = theString.substring(0, theString.lastIndexOf(separator)).replaceAll(separator , replacement).concat(theString.substring(theString.lastIndexOf(separator)));
 
-
             newString = newString.replaceFirst("^0+(?!$)", "");
 
             String withComma = newString;
@@ -313,7 +317,12 @@ public abstract class Converter {
             withComma = withComma.replace(".", "");
             withComma = withComma.replace(",", ".");
 
-            return withComma;
+
+            double decimalNumber = Double.parseDouble(withComma);
+
+            double roundOff = Math.round(decimalNumber * 100.0) / 100.0;
+
+            return roundOff + "";
         } catch(StringIndexOutOfBoundsException e) {
             System.out.println(theString);
             e.printStackTrace();
