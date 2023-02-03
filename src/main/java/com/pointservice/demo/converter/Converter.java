@@ -163,7 +163,7 @@ public abstract class Converter {
             String cigElement = row.get(AttributeType.CIG.getValue());
             String subject = row.get(AttributeType.OGGETTO.getValue());
             String denominazioneText = row.get(AttributeType.DENOMINAZIONE.getValue());
-            String codFiscaleText = row.get(AttributeType.COD_FISCALE.getValue()).replace(".","");
+            String codFiscaleText = this.getNormalizedCodFiscaleProp(row.get(AttributeType.COD_FISCALE.getValue()).replace(".",""));
             String codFiscaleAggiudicante = row.get(AttributeType.AGG_COD_FISCALE.getValue()).replace(".", "");
             String ragioneSociale = this.tryOrGetValue(row, AttributeType.AGG_RAGIONE_SOCIALE.getValue());
             String importoAggiudicazione = this.getNormalizedPrice(this.tryOrGetValue(row, AttributeType.IMPORTO_NETTO.getValue()));
@@ -214,8 +214,12 @@ public abstract class Converter {
 
             Element partecipante2 = new Element("partecipante");
 
+            Element aggiudicatario = new Element("aggiudicatario");
+
             if(!codFiscaleAggiudicante.equals("")) partecipante.addContent(new Element("codiceFiscale").setText(codFiscaleAggiudicante));
             if(!ragioneSociale.equals("")) partecipante.addContent(new Element("ragioneSociale").addContent(ragioneSociale));
+            if(!codFiscaleAggiudicante.equals("")) aggiudicatario.addContent(new Element("codiceFiscale").setText(codFiscaleAggiudicante));
+            if(!ragioneSociale.equals("")) aggiudicatario.addContent(new Element("ragioneSociale").addContent(ragioneSociale));
             if(!ruolo.equals("")) partecipante.addContent(new Element("ruolo").addContent(ruolo));
             if(!codFiscaleAggiudicante2.equals("")) partecipante2.addContent(new Element("codiceFiscale").addContent(codFiscaleAggiudicante2));
             if(!ragioneSociale2.equals("")) partecipante2.addContent(new Element("ragioneSociale").addContent(ragioneSociale2));
@@ -232,7 +236,9 @@ public abstract class Converter {
                 partecipanti.addContent(partecipante2);
             }
 
-
+            if(aggiudicatario.getContent().size() != 0) {
+                aggiudicatari.addContent(aggiudicatario);
+            }
 
             strutturaProponente.addContent(codFiscale);
             strutturaProponente.addContent(denominazione);
@@ -246,7 +252,7 @@ public abstract class Converter {
             if(!importoAggiudicazione.equals("")) {
                 lotto.addContent(new Element("importoAggiudicazione").setText(importoAggiudicazione));
             }
-            if(!dataInizio.equals("")) lotto.addContent(tempiCompletamento);
+            lotto.addContent(tempiCompletamento);
             lotto.addContent(importoSommeLiquidate);
 
             data.addContent(lotto);
@@ -282,6 +288,25 @@ public abstract class Converter {
         return "";
     }
 
+    private String getNormalizedCodFiscaleProp(String codFiscale) {
+
+        int characterToSubtract = 0;
+
+        if(codFiscale.length() == 11) {
+            characterToSubtract = 2;
+        } else if(codFiscale.length() == 12) {
+            characterToSubtract = 3;
+        }
+
+        codFiscale = codFiscale.substring(0, codFiscale.length() - characterToSubtract);
+
+        if(!codFiscale.startsWith("0")) {
+            return "00" + codFiscale;
+        }
+
+        return codFiscale;
+    }
+
     private String getNormalizedDate(String date) {
 
         if(date.equals("")) {
@@ -311,7 +336,11 @@ public abstract class Converter {
 
         if(theString.length() == 0) return "";
 
-        theString = theString.replace("€", "").trim();
+        theString = theString.replace("€", "");
+
+        theString = theString.replace("£", "");
+
+        theString = theString.trim();
 
 
 
